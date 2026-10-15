@@ -1,11 +1,11 @@
 # ASID-Extreme-Super-Resolution: Factorized Pre-Upsampling Attention-Sharing Transformer for Extreme ($\times 8$) Super-Resolution
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%20%7C%203.13-blue.svg)](https://www.python.org/)
-[![PyTorch 2.5](https://img.shields.io/badge/PyTorch-2.5%2B-EE4C2C.svg)](https://pytorch.org/)
-[![CUDA Accelerated](https://img.shields.io/badge/CUDA-H100%20%7C%20RTX%20Enabled-76B900.svg)](https://developer.nvidia.com/cuda-zone)
-[![Parameters 313K](https://img.shields.io/badge/Parameters-313K%20(-16.6%25)-success.svg)](#-architecture--complexity)
+[![PyTorch 2.5](https://img.shields.io/badge/PyTorch-2.5+-EE4C2C.svg)](https://pytorch.org/)
+[![CUDA Accelerated](https://img.shields.io/badge/CUDA-H100%20%2F%20RTX-76B900.svg)](https://developer.nvidia.com/cuda-zone)
+[![Parameters 313K](https://img.shields.io/badge/Parameters-313K-success.svg)](#-architecture--complexity)
 [![Scale x8](https://img.shields.io/badge/Scale-x8_Extreme-brightgreen.svg)](#-quantitative-benchmark-results)
-[![Set5 PSNR](https://img.shields.io/badge/Set5%20PSNR-25.77%20dB%20(+1.37)-orange.svg)](#-quantitative-benchmark-results)
+[![Set5 PSNR](https://img.shields.io/badge/Set5%20PSNR-25.77%20dB-orange.svg)](#-quantitative-benchmark-results)
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1f9dEHFpCiuei5UZdbdWxa7GyFYSodoqr?usp=sharing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
