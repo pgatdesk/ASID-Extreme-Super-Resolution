@@ -1,0 +1,35 @@
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+env/
+
+# Large binaries, archives, and model checkpoints (do NOT push checkpoints)
+*.pth
+*.pt
+*.ckpt
+*.bin
+*.onnx
+*.zip
+*.tar.gz
+*.bak
+*.bak.*
+cv_project_code.zip
+checkpoints/
+
+# Datasets and benchmark image files (do NOT push raw datasets)
+benchmark/
+datasets/
+DIV2K/
+DIV2K*/
+SR/
+SR_Results/
+test_logs/
+train_logs/**/checkpoints/
+train_logs/**/summary/
+train_logs/**/samples/
+comparison_img001/

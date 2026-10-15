@@ -1,0 +1,700 @@
+[1]-[parameters] version--ASID_PreUpsample_X8_DIV2K
+[2]-[parameters] phase--train
+[3]-[parameters] cuda--0
+[4]-[parameters] ckpt--74
+[5]-[parameters] experiment_description--traing OmniSR
+[6]-[parameters] train_yaml--train_ASID_PreUpsample_X8_DIV2K.yaml
+[7]-[parameters] logger--tensorboard
+[8]-[parameters] train_script_name--common
+[9]-[parameters] module_script_name--ASID_PreUpsample
+[10]-[parameters] class_name--ASID_PreUpsample
+[11]-[parameters] feature_num--48
+[12]-[parameters] module_params--{'pre_scale': 2, 'post_scale': 4, 'pre_mode': 'bilinear', 'res_num': 3, 'block_num': 1, 'bias': True, 'block_script_name': 'IDSA', 'block_class_name': 'IDSA_Block2', 'window_size': 8, 'pe': True, 'ffn_bias': True}
+[13]-[parameters] total_epoch--1000
+[14]-[parameters] dataloader--DIV2K_memory
+[15]-[parameters] dataset_name--DIV2K
+[16]-[parameters] batch_size--16
+[17]-[parameters] random_seed--1234
+[18]-[parameters] dataset_params--{'lr_patch_size': 48, 'degradation': 'bicubic', 'image_scale': 8, 'subffix': 'png', 'dataloader_workers': 4, 'dataset_enlarge': 64, 'color_jitter': False, 'color_config': {'brightness': 0.02, 'contrast': 0.02, 'saturation': 0.02, 'hue': 0.02}, 'enable_reshuffle': False}
+[19]-[parameters] eval_dataloader--memory
+[20]-[parameters] eval_dataset_name--urban100
+[21]-[parameters] eval_batch_size--1
+[22]-[parameters] lr_decay--0.5
+[23]-[parameters] lr_decay_step--[250, 500, 750, 1000]
+[24]-[parameters] lr_decay_enable--True
+[25]-[parameters] optim_type--AdamW
+[26]-[parameters] optim_config--{'lr': 0.0005, 'betas': [0.9, 0.999], 'weight_decay': 0.0001}
+[27]-[parameters] l1_weight--30.0
+[28]-[parameters] perceptual--{'layer_weights': {'conv5_4': 1}, 'vgg_type': 'vgg19', 'use_input_norm': True, 'perceptual_weight': 1.0, 'criterion': 'l1'}
+[29]-[parameters] log_step--200
+[30]-[parameters] sample_step--200
+[31]-[parameters] model_save_epoch--1
+[32]-[parameters] use_tensorboard--True
+[33]-[parameters] checkpoint_names--{'generator_name': 'ASID'}
+[34]-[parameters] log_root_path--./train_logs
+[35]-[parameters] project_root--./train_logs/ASID_PreUpsample_X8_DIV2K
+[36]-[parameters] project_summary--./train_logs/ASID_PreUpsample_X8_DIV2K/summary
+[37]-[parameters] project_checkpoints--./train_logs/ASID_PreUpsample_X8_DIV2K/checkpoints
+[38]-[parameters] project_samples--./train_logs/ASID_PreUpsample_X8_DIV2K/samples
+[39]-[parameters] project_scripts--./train_logs/ASID_PreUpsample_X8_DIV2K/scripts
+[40]-[parameters] reporter_path--./train_logs/ASID_PreUpsample_X8_DIV2K/ASID_PreUpsample_X8_DIV2K_report
+[41]-[parameters] dataset_paths--{'Flickr': '/home/Flickr2K', 'DIV2K': '/home/priyanshg/asid_h100/DIV2K', 'DF2K': {'Flickr': '/home/Flickr2K', 'DIV2K': './datasets/mini_div2k'}}
+[42]-[parameters] test_dataset_paths--{'urban100': './benchmark', 'b100': './benchmark', 'set5': './benchmark', 'set14': './benchmark', 'manga109': './benchmark'}
+[43]-[2026-10-04 13:45:57]-[info] Model structure:
+[44]-[model] ASID_PreUpsample(
+  (block0): IDSG_A(
+    (res_end): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    (residual_layer): Sequential(
+      (0): IDSA_Block1(
+        (LB1): LB(
+          (net): MBConvResidual(
+            (fn): Sequential(
+              (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+              (1): GELU(approximate='none')
+              (2): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+              (3): GELU(approximate='none')
+              (4): SqueezeExcitation(
+                (gate): Sequential(
+                  (0): Reduce('b c h w -> b c', 'mean')
+                  (1): Linear(in_features=48, out_features=12, bias=False)
+                  (2): SiLU()
+                  (3): Linear(in_features=12, out_features=48, bias=False)
+                  (4): Sigmoid()
+                  (5): Rearrange('b c -> b c 1 1')
+                )
+              )
+              (5): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+            )
+            (dropsample): Dropsample()
+          )
+        )
+        (LB2): LB(
+          (net): MBConvResidual(
+            (fn): Sequential(
+              (0): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+              (1): GELU(approximate='none')
+              (2): Conv2d(36, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=36)
+              (3): GELU(approximate='none')
+              (4): SqueezeExcitation(
+                (gate): Sequential(
+                  (0): Reduce('b c h w -> b c', 'mean')
+                  (1): Linear(in_features=36, out_features=9, bias=False)
+                  (2): SiLU()
+                  (3): Linear(in_features=9, out_features=36, bias=False)
+                  (4): Sigmoid()
+                  (5): Rearrange('b c -> b c 1 1')
+                )
+              )
+              (5): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+            )
+            (dropsample): Dropsample()
+          )
+        )
+        (LB3): LB(
+          (net): MBConvResidual(
+            (fn): Sequential(
+              (0): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+              (1): GELU(approximate='none')
+              (2): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+              (3): GELU(approximate='none')
+              (4): SqueezeExcitation(
+                (gate): Sequential(
+                  (0): Reduce('b c h w -> b c', 'mean')
+                  (1): Linear(in_features=24, out_features=6, bias=False)
+                  (2): SiLU()
+                  (3): Linear(in_features=6, out_features=24, bias=False)
+                  (4): Sigmoid()
+                  (5): Rearrange('b c -> b c 1 1')
+                )
+              )
+              (5): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+            )
+            (dropsample): Dropsample()
+          )
+        )
+        (SLA1): SLA_A(
+          (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=36, out_features=108, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=36, out_features=36, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+            (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SLA2): SLA_A(
+          (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=24, out_features=72, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=24, out_features=24, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+            (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SLA3): SLA_A(
+          (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=12, out_features=36, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=12, out_features=12, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+            (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SGA1): SGA_A(
+          (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=36, out_features=108, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=36, out_features=36, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+            (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SGA2): SGA_A(
+          (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=24, out_features=72, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=24, out_features=24, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+            (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SGA3): SGA_A(
+          (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=12, out_features=36, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=12, out_features=12, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+            (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (BlockC): TrBlockC(
+          (canorm1): LayerNorm2d()
+          (canorm2): LayerNorm2d()
+          (cttn1): Channel_Attention(
+            (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (cttn2): Channel_Attention_grid(
+            (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (cnorm1): LayerNorm2d()
+          (cnorm2): LayerNorm2d()
+          (gfn1): Gated_Conv_FeedForward(
+            (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (gfn2): Gated_Conv_FeedForward(
+            (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (pw1): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+        (pw2): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+        (pw3): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (esa): ESA(
+      (conv1): Conv2d(48, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv_f): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(2, 2))
+      (conv3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (conv4): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+      (sigmoid): Sigmoid()
+      (relu): ReLU(inplace=True)
+    )
+  )
+  (block1): IDSG(
+    (residual_layer): IDSA_Block2(
+      (LB1): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=48, out_features=12, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=12, out_features=48, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB2): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(36, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=36)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=36, out_features=9, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=9, out_features=36, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB3): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=24, out_features=6, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=6, out_features=24, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (SLA1): SLA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA2): SLA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA3): SLA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA1): SGA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA2): SGA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA3): SGA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (BlockC): TrBlockC(
+        (canorm1): LayerNorm2d()
+        (canorm2): LayerNorm2d()
+        (cttn1): Channel_Attention(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cttn2): Channel_Attention_grid(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cnorm1): LayerNorm2d()
+        (cnorm2): LayerNorm2d()
+        (gfn1): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (gfn2): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (pw1): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+      (pw2): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+      (pw3): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (res_end): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    (esa): ESA(
+      (conv1): Conv2d(48, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv_f): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(2, 2))
+      (conv3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (conv4): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+      (sigmoid): Sigmoid()
+      (relu): ReLU(inplace=True)
+    )
+  )
+  (block2): IDSG(
+    (residual_layer): IDSA_Block2(
+      (LB1): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=48, out_features=12, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=12, out_features=48, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB2): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(36, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=36)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=36, out_features=9, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=9, out_features=36, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB3): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=24, out_features=6, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=6, out_features=24, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (SLA1): SLA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA2): SLA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA3): SLA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA1): SGA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA2): SGA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA3): SGA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (BlockC): TrBlockC(
+        (canorm1): LayerNorm2d()
+        (canorm2): LayerNorm2d()
+        (cttn1): Channel_Attention(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cttn2): Channel_Attention_grid(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cnorm1): LayerNorm2d()
+        (cnorm2): LayerNorm2d()
+        (gfn1): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (gfn2): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (pw1): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+      (pw2): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+      (pw3): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (res_end): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    (esa): ESA(
+      (conv1): Conv2d(48, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv_f): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(2, 2))
+      (conv3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (conv4): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+      (sigmoid): Sigmoid()
+      (relu): ReLU(inplace=True)
+    )
+  )
+  (input): Conv2d(3, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (output): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (up): Sequential(
+    (0): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=4)
+  )
+)
+[45]-[2026-10-04 13:46:00]-[info] Model FLOPs: 2.686G
+[46]-[2026-10-04 13:46:00]-[info] Model Params: 309.732K

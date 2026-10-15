@@ -1,0 +1,900 @@
+[1]-[parameters] version--ASID_PreUpsample_X8_DIV2K
+[2]-[parameters] phase--train
+[3]-[parameters] cuda--0
+[4]-[parameters] ckpt--74
+[5]-[parameters] experiment_description--traing OmniSR
+[6]-[parameters] train_yaml--train_ASID_PreUpsample_X8_DIV2K.yaml
+[7]-[parameters] logger--tensorboard
+[8]-[parameters] train_script_name--common
+[9]-[parameters] module_script_name--ASID_PreUpsample
+[10]-[parameters] class_name--ASID_PreUpsample
+[11]-[parameters] feature_num--48
+[12]-[parameters] module_params--{'pre_scale': 2, 'post_scale': 4, 'pre_mode': 'bilinear', 'res_num': 3, 'block_num': 1, 'bias': True, 'block_script_name': 'IDSA', 'block_class_name': 'IDSA_Block2', 'window_size': 8, 'pe': True, 'ffn_bias': True}
+[13]-[parameters] total_epoch--20
+[14]-[parameters] dataloader--DIV2K_memory
+[15]-[parameters] dataset_name--DIV2K
+[16]-[parameters] batch_size--4
+[17]-[parameters] random_seed--1234
+[18]-[parameters] dataset_params--{'lr_patch_size': 48, 'degradation': 'bicubic', 'image_scale': 8, 'subffix': 'png', 'dataloader_workers': 4, 'dataset_enlarge': 8, 'color_jitter': False, 'color_config': {'brightness': 0.02, 'contrast': 0.02, 'saturation': 0.02, 'hue': 0.02}, 'enable_reshuffle': False}
+[19]-[parameters] eval_dataloader--memory
+[20]-[parameters] eval_dataset_name--urban100
+[21]-[parameters] eval_batch_size--1
+[22]-[parameters] lr_decay--0.5
+[23]-[parameters] lr_decay_step--[10, 15]
+[24]-[parameters] lr_decay_enable--True
+[25]-[parameters] optim_type--AdamW
+[26]-[parameters] optim_config--{'lr': 0.0005, 'betas': [0.9, 0.999], 'weight_decay': 0.0001}
+[27]-[parameters] l1_weight--30.0
+[28]-[parameters] perceptual--{'layer_weights': {'conv5_4': 1}, 'vgg_type': 'vgg19', 'use_input_norm': True, 'perceptual_weight': 1.0, 'criterion': 'l1'}
+[29]-[parameters] log_step--200
+[30]-[parameters] sample_step--200
+[31]-[parameters] model_save_epoch--1
+[32]-[parameters] use_tensorboard--True
+[33]-[parameters] checkpoint_names--{'generator_name': 'ASID'}
+[34]-[parameters] log_root_path--./train_logs
+[35]-[parameters] project_root--./train_logs/ASID_PreUpsample_X8_DIV2K
+[36]-[parameters] project_summary--./train_logs/ASID_PreUpsample_X8_DIV2K/summary
+[37]-[parameters] project_checkpoints--./train_logs/ASID_PreUpsample_X8_DIV2K/checkpoints
+[38]-[parameters] project_samples--./train_logs/ASID_PreUpsample_X8_DIV2K/samples
+[39]-[parameters] project_scripts--./train_logs/ASID_PreUpsample_X8_DIV2K/scripts
+[40]-[parameters] reporter_path--./train_logs/ASID_PreUpsample_X8_DIV2K/ASID_PreUpsample_X8_DIV2K_report
+[41]-[parameters] dataset_paths--{'Flickr': '/home/Flickr2K', 'DIV2K': '/home/priyanshg/asid_h100/DIV2K', 'DF2K': {'Flickr': '/home/Flickr2K', 'DIV2K': './datasets/mini_div2k'}}
+[42]-[parameters] test_dataset_paths--{'urban100': './benchmark', 'b100': './benchmark', 'set5': './benchmark', 'set14': './benchmark', 'manga109': './benchmark'}
+[43]-[2026-10-04 17:55:30]-[info] Model structure:
+[44]-[model] ASID_PreUpsample(
+  (block0): IDSG_A(
+    (res_end): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    (residual_layer): Sequential(
+      (0): IDSA_Block1(
+        (LB1): LB(
+          (net): MBConvResidual(
+            (fn): Sequential(
+              (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+              (1): GELU(approximate='none')
+              (2): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+              (3): GELU(approximate='none')
+              (4): SqueezeExcitation(
+                (gate): Sequential(
+                  (0): Reduce('b c h w -> b c', 'mean')
+                  (1): Linear(in_features=48, out_features=12, bias=False)
+                  (2): SiLU()
+                  (3): Linear(in_features=12, out_features=48, bias=False)
+                  (4): Sigmoid()
+                  (5): Rearrange('b c -> b c 1 1')
+                )
+              )
+              (5): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+            )
+            (dropsample): Dropsample()
+          )
+        )
+        (LB2): LB(
+          (net): MBConvResidual(
+            (fn): Sequential(
+              (0): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+              (1): GELU(approximate='none')
+              (2): Conv2d(36, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=36)
+              (3): GELU(approximate='none')
+              (4): SqueezeExcitation(
+                (gate): Sequential(
+                  (0): Reduce('b c h w -> b c', 'mean')
+                  (1): Linear(in_features=36, out_features=9, bias=False)
+                  (2): SiLU()
+                  (3): Linear(in_features=9, out_features=36, bias=False)
+                  (4): Sigmoid()
+                  (5): Rearrange('b c -> b c 1 1')
+                )
+              )
+              (5): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+            )
+            (dropsample): Dropsample()
+          )
+        )
+        (LB3): LB(
+          (net): MBConvResidual(
+            (fn): Sequential(
+              (0): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+              (1): GELU(approximate='none')
+              (2): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+              (3): GELU(approximate='none')
+              (4): SqueezeExcitation(
+                (gate): Sequential(
+                  (0): Reduce('b c h w -> b c', 'mean')
+                  (1): Linear(in_features=24, out_features=6, bias=False)
+                  (2): SiLU()
+                  (3): Linear(in_features=6, out_features=24, bias=False)
+                  (4): Sigmoid()
+                  (5): Rearrange('b c -> b c 1 1')
+                )
+              )
+              (5): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+            )
+            (dropsample): Dropsample()
+          )
+        )
+        (SLA1): SLA_A(
+          (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=36, out_features=108, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=36, out_features=36, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+            (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SLA2): SLA_A(
+          (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=24, out_features=72, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=24, out_features=24, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+            (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SLA3): SLA_A(
+          (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=12, out_features=36, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=12, out_features=12, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+            (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SGA1): SGA_A(
+          (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=36, out_features=108, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=36, out_features=36, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+            (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SGA2): SGA_A(
+          (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=24, out_features=72, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=24, out_features=24, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+            (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (SGA3): SGA_A(
+          (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+          (attn): SelfAttentionA(
+            (to_qkv): Linear(in_features=12, out_features=36, bias=False)
+            (attend): Sequential(
+              (0): Softmax(dim=-1)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (to_out): Sequential(
+              (0): Linear(in_features=12, out_features=12, bias=False)
+              (1): Dropout(p=0.0, inplace=False)
+            )
+            (rel_pos_bias): Embedding(225, 1)
+          )
+          (cnorm): LayerNorm2d()
+          (gfn): Gated_Conv_FeedForward(
+            (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+            (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (BlockC): TrBlockC(
+          (canorm1): LayerNorm2d()
+          (canorm2): LayerNorm2d()
+          (cttn1): Channel_Attention(
+            (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (cttn2): Channel_Attention_grid(
+            (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (cnorm1): LayerNorm2d()
+          (cnorm2): LayerNorm2d()
+          (gfn1): Gated_Conv_FeedForward(
+            (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+          (gfn2): Gated_Conv_FeedForward(
+            (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+            (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+            (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          )
+        )
+        (pw1): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+        (pw2): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+        (pw3): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+      )
+    )
+    (esa): ESA(
+      (conv1): Conv2d(48, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv_f): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(2, 2))
+      (conv3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (conv4): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+      (sigmoid): Sigmoid()
+      (relu): ReLU(inplace=True)
+    )
+  )
+  (block1): IDSG(
+    (residual_layer): IDSA_Block2(
+      (LB1): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=48, out_features=12, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=12, out_features=48, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB2): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(36, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=36)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=36, out_features=9, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=9, out_features=36, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB3): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=24, out_features=6, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=6, out_features=24, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (SLA1): SLA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA2): SLA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA3): SLA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA1): SGA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA2): SGA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA3): SGA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (BlockC): TrBlockC(
+        (canorm1): LayerNorm2d()
+        (canorm2): LayerNorm2d()
+        (cttn1): Channel_Attention(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cttn2): Channel_Attention_grid(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cnorm1): LayerNorm2d()
+        (cnorm2): LayerNorm2d()
+        (gfn1): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (gfn2): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (pw1): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+      (pw2): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+      (pw3): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (res_end): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    (esa): ESA(
+      (conv1): Conv2d(48, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv_f): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(2, 2))
+      (conv3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (conv4): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+      (sigmoid): Sigmoid()
+      (relu): ReLU(inplace=True)
+    )
+  )
+  (block2): IDSG(
+    (residual_layer): IDSA_Block2(
+      (LB1): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=48, out_features=12, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=12, out_features=48, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB2): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(36, 36, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=36)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=36, out_features=9, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=9, out_features=36, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (LB3): LB(
+        (net): MBConvResidual(
+          (fn): Sequential(
+            (0): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+            (1): GELU(approximate='none')
+            (2): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24)
+            (3): GELU(approximate='none')
+            (4): SqueezeExcitation(
+              (gate): Sequential(
+                (0): Reduce('b c h w -> b c', 'mean')
+                (1): Linear(in_features=24, out_features=6, bias=False)
+                (2): SiLU()
+                (3): Linear(in_features=6, out_features=24, bias=False)
+                (4): Sigmoid()
+                (5): Rearrange('b c -> b c 1 1')
+              )
+            )
+            (5): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1))
+          )
+          (dropsample): Dropsample()
+        )
+      )
+      (SLA1): SLA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA2): SLA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SLA3): SLA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA1): SGA_B(
+        (norm): LayerNorm((36,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=36, out_features=36, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=36, out_features=36, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(36, 72, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(72, 72, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=72, bias=False)
+          (project_out): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA2): SGA_B(
+        (norm): LayerNorm((24,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=24, out_features=24, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=24, out_features=24, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(24, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=48, bias=False)
+          (project_out): Conv2d(24, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (SGA3): SGA_B(
+        (norm): LayerNorm((12,), eps=1e-05, elementwise_affine=True)
+        (attn): SelfAttentionB(
+          (to_v): Linear(in_features=12, out_features=12, bias=False)
+          (to_out): Sequential(
+            (0): Linear(in_features=12, out_features=12, bias=False)
+            (1): Dropout(p=0.0, inplace=False)
+          )
+        )
+        (cnorm): LayerNorm2d()
+        (gfn): Gated_Conv_FeedForward(
+          (project_in): Conv2d(12, 24, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(24, 24, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=24, bias=False)
+          (project_out): Conv2d(12, 12, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (BlockC): TrBlockC(
+        (canorm1): LayerNorm2d()
+        (canorm2): LayerNorm2d()
+        (cttn1): Channel_Attention(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cttn2): Channel_Attention_grid(
+          (qkv): Conv2d(48, 144, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (qkv_dwconv): Conv2d(144, 144, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=144, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (cnorm1): LayerNorm2d()
+        (cnorm2): LayerNorm2d()
+        (gfn1): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+        (gfn2): Gated_Conv_FeedForward(
+          (project_in): Conv2d(48, 96, kernel_size=(1, 1), stride=(1, 1), bias=False)
+          (dwconv): Conv2d(96, 96, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), groups=96, bias=False)
+          (project_out): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1), bias=False)
+        )
+      )
+      (pw1): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+      (pw2): Conv2d(36, 36, kernel_size=(1, 1), stride=(1, 1))
+      (pw3): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    )
+    (res_end): Conv2d(48, 48, kernel_size=(1, 1), stride=(1, 1))
+    (esa): ESA(
+      (conv1): Conv2d(48, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv_f): Conv2d(16, 16, kernel_size=(1, 1), stride=(1, 1))
+      (conv2): Conv2d(16, 16, kernel_size=(3, 3), stride=(2, 2))
+      (conv3): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+      (conv4): Conv2d(16, 48, kernel_size=(1, 1), stride=(1, 1))
+      (sigmoid): Sigmoid()
+      (relu): ReLU(inplace=True)
+    )
+  )
+  (input): Conv2d(3, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (output): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+  (up): Sequential(
+    (0): Conv2d(48, 48, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): PixelShuffle(upscale_factor=4)
+  )
+)
+[45]-[2026-10-04 17:55:31]-[info] Model FLOPs: 2.686G
+[46]-[2026-10-04 17:55:31]-[info] Model Params: 309.732K
+[47]-[2026-10-04 17:56:01]-[logInfo]-epoch[1]-step[200] loss: 0.1262, l1: 0.1262
+[48]-[2026-10-04 17:56:27]-[logInfo]-epoch[1]-step[400] loss: 0.0728, l1: 0.0728
+[49]-[2026-10-04 17:56:52]-[logInfo]-epoch[1]-step[600] loss: 0.1541, l1: 0.1541
+[50]-[2026-10-04 17:57:19]-[logInfo]-epoch[1]-step[800] loss: 0.0964, l1: 0.0964
+[51]-[2026-10-04 17:57:47]-[logInfo]-epoch[1]-step[1000] loss: 0.1084, l1: 0.1084
+[52]-[2026-10-04 17:58:14]-[logInfo]-epoch[1]-step[1200] loss: 0.0884, l1: 0.0884
+[53]-[2026-10-04 17:58:41]-[logInfo]-epoch[1]-step[1400] loss: 0.0857, l1: 0.0857
+[54]-[2026-10-04 17:59:10]-[logInfo]-epoch[1]-step[1600] loss: 0.0894, l1: 0.0894
+[55]-[2026-10-04 18:00:24]-[logInfo]-epoch[1]-step[0] Dataset: Set14, PSNR: 23.6244, SSIM: 0.5983
+[56]-[2026-10-04 18:00:35]-[logInfo]-epoch[1]-step[0] Dataset: Set5, PSNR: 25.3628, SSIM: 0.6992
+[57]-[2026-10-04 18:01:04]-[logInfo]-epoch[2]-step[200] loss: 0.0624, l1: 0.0624
+[58]-[2026-10-04 18:01:32]-[logInfo]-epoch[2]-step[400] loss: 0.1248, l1: 0.1248
+[59]-[2026-10-04 18:01:58]-[logInfo]-epoch[2]-step[600] loss: 0.1184, l1: 0.1184
+[60]-[2026-10-04 18:02:26]-[logInfo]-epoch[2]-step[800] loss: 0.0738, l1: 0.0738
+[61]-[2026-10-04 18:02:53]-[logInfo]-epoch[2]-step[1000] loss: 0.0779, l1: 0.0779
+[62]-[2026-10-04 18:03:20]-[logInfo]-epoch[2]-step[1200] loss: 0.0845, l1: 0.0845
+[63]-[2026-10-04 18:03:47]-[logInfo]-epoch[2]-step[1400] loss: 0.1131, l1: 0.1131
+[64]-[2026-10-04 18:04:17]-[logInfo]-epoch[2]-step[1600] loss: 0.0750, l1: 0.0750
+[65]-[2026-10-04 18:05:18]-[logInfo]-epoch[2]-step[0] Dataset: Set14, PSNR: 23.7631, SSIM: 0.6061
+[66]-[2026-10-04 18:05:18]-[logInfo]-epoch[2]-step[0] Dataset: Set5, PSNR: 25.5492, SSIM: 0.7140
+[67]-[2026-10-04 18:05:46]-[logInfo]-epoch[3]-step[200] loss: 0.1278, l1: 0.1278
+[68]-[2026-10-04 18:06:14]-[logInfo]-epoch[3]-step[400] loss: 0.1040, l1: 0.1040
+[69]-[2026-10-04 18:06:41]-[logInfo]-epoch[3]-step[600] loss: 0.1191, l1: 0.1191
+[70]-[2026-10-04 18:07:09]-[logInfo]-epoch[3]-step[800] loss: 0.0602, l1: 0.0602
+[71]-[2026-10-04 18:07:35]-[logInfo]-epoch[3]-step[1000] loss: 0.1015, l1: 0.1015
+[72]-[2026-10-04 18:08:03]-[logInfo]-epoch[3]-step[1200] loss: 0.1384, l1: 0.1384
+[73]-[2026-10-04 18:08:31]-[logInfo]-epoch[3]-step[1400] loss: 0.0678, l1: 0.0678
+[74]-[2026-10-04 18:08:59]-[logInfo]-epoch[3]-step[1600] loss: 0.0670, l1: 0.0670
+[75]-[2026-10-04 18:10:40]-[logInfo]-epoch[3]-step[0] Dataset: Set14, PSNR: 23.8965, SSIM: 0.6114
+[76]-[2026-10-04 18:10:50]-[logInfo]-epoch[3]-step[0] Dataset: Set5, PSNR: 25.7630, SSIM: 0.7213
+[77]-[2026-10-04 18:11:14]-[logInfo]-epoch[4]-step[200] loss: 0.1390, l1: 0.1390
+[78]-[2026-10-04 18:11:41]-[logInfo]-epoch[4]-step[400] loss: 0.1177, l1: 0.1177
+[79]-[2026-10-04 18:12:06]-[logInfo]-epoch[4]-step[600] loss: 0.0540, l1: 0.0540
+[80]-[2026-10-04 18:12:33]-[logInfo]-epoch[4]-step[800] loss: 0.1015, l1: 0.1015
+[81]-[2026-10-04 18:13:00]-[logInfo]-epoch[4]-step[1000] loss: 0.0701, l1: 0.0701
+[82]-[2026-10-04 18:13:27]-[logInfo]-epoch[4]-step[1200] loss: 0.0662, l1: 0.0662
+[83]-[2026-10-04 18:13:55]-[logInfo]-epoch[4]-step[1400] loss: 0.1182, l1: 0.1182
+[84]-[2026-10-04 18:14:24]-[logInfo]-epoch[4]-step[1600] loss: 0.0701, l1: 0.0701
+[85]-[2026-10-04 18:15:22]-[logInfo]-epoch[4]-step[0] Dataset: Set14, PSNR: 23.9399, SSIM: 0.6141
+[86]-[2026-10-04 18:15:22]-[logInfo]-epoch[4]-step[0] Dataset: Set5, PSNR: 25.8640, SSIM: 0.7286
+[87]-[2026-10-04 18:15:48]-[logInfo]-epoch[5]-step[200] loss: 0.0883, l1: 0.0883
+[88]-[2026-10-04 18:16:13]-[logInfo]-epoch[5]-step[400] loss: 0.0422, l1: 0.0422
+[89]-[2026-10-04 18:16:37]-[logInfo]-epoch[5]-step[600] loss: 0.0846, l1: 0.0846
+[90]-[2026-10-04 18:17:05]-[logInfo]-epoch[5]-step[800] loss: 0.0663, l1: 0.0663
+[91]-[2026-10-04 18:17:34]-[logInfo]-epoch[5]-step[1000] loss: 0.0613, l1: 0.0613
+[92]-[2026-10-04 18:18:02]-[logInfo]-epoch[5]-step[1200] loss: 0.1041, l1: 0.1041
+[93]-[2026-10-04 18:18:31]-[logInfo]-epoch[5]-step[1400] loss: 0.0509, l1: 0.0509
+[94]-[2026-10-04 18:18:59]-[logInfo]-epoch[5]-step[1600] loss: 0.1056, l1: 0.1056
+[95]-[2026-10-04 18:20:09]-[logInfo]-epoch[5]-step[0] Dataset: Set14, PSNR: 23.9566, SSIM: 0.6174
+[96]-[2026-10-04 18:20:26]-[logInfo]-epoch[5]-step[0] Dataset: Set5, PSNR: 25.8850, SSIM: 0.7325
+[97]-[2026-10-04 18:20:55]-[logInfo]-epoch[6]-step[200] loss: 0.1017, l1: 0.1017
+[98]-[2026-10-04 18:21:20]-[logInfo]-epoch[6]-step[400] loss: 0.1145, l1: 0.1145
+[99]-[2026-10-04 18:21:48]-[logInfo]-epoch[6]-step[600] loss: 0.0805, l1: 0.0805
+[100]-[2026-10-04 18:22:16]-[logInfo]-epoch[6]-step[800] loss: 0.0477, l1: 0.0477
+[101]-[2026-10-04 18:22:44]-[logInfo]-epoch[6]-step[1000] loss: 0.0538, l1: 0.0538
+[102]-[2026-10-04 18:23:12]-[logInfo]-epoch[6]-step[1200] loss: 0.0655, l1: 0.0655
+[103]-[2026-10-04 18:23:37]-[logInfo]-epoch[6]-step[1400] loss: 0.1230, l1: 0.1230
+[104]-[2026-10-04 18:24:05]-[logInfo]-epoch[6]-step[1600] loss: 0.0665, l1: 0.0665
+[105]-[2026-10-04 18:25:28]-[logInfo]-epoch[6]-step[0] Dataset: Set14, PSNR: 24.0396, SSIM: 0.6189
+[106]-[2026-10-04 18:25:29]-[logInfo]-epoch[6]-step[0] Dataset: Set5, PSNR: 25.9639, SSIM: 0.7367
+[107]-[2026-10-04 18:25:58]-[logInfo]-epoch[7]-step[200] loss: 0.0663, l1: 0.0663
+[108]-[2026-10-04 18:26:26]-[logInfo]-epoch[7]-step[400] loss: 0.1067, l1: 0.1067
+[109]-[2026-10-04 18:26:54]-[logInfo]-epoch[7]-step[600] loss: 0.0625, l1: 0.0625
+[110]-[2026-10-04 18:27:22]-[logInfo]-epoch[7]-step[800] loss: 0.0613, l1: 0.0613
+[111]-[2026-10-04 18:27:45]-[logInfo]-epoch[7]-step[1000] loss: 0.1085, l1: 0.1085
+[112]-[2026-10-04 18:28:11]-[logInfo]-epoch[7]-step[1200] loss: 0.0862, l1: 0.0862
+[113]-[2026-10-04 18:28:37]-[logInfo]-epoch[7]-step[1400] loss: 0.0838, l1: 0.0838
+[114]-[2026-10-04 18:29:06]-[logInfo]-epoch[7]-step[1600] loss: 0.0640, l1: 0.0640
+[115]-[2026-10-04 18:30:23]-[logInfo]-epoch[7]-step[0] Dataset: Set14, PSNR: 24.0156, SSIM: 0.6189
+[116]-[2026-10-04 18:30:24]-[logInfo]-epoch[7]-step[0] Dataset: Set5, PSNR: 25.8964, SSIM: 0.7343
+[117]-[2026-10-04 18:30:49]-[logInfo]-epoch[8]-step[200] loss: 0.0838, l1: 0.0838
+[118]-[2026-10-04 18:31:18]-[logInfo]-epoch[8]-step[400] loss: 0.0678, l1: 0.0678
+[119]-[2026-10-04 18:31:43]-[logInfo]-epoch[8]-step[600] loss: 0.0723, l1: 0.0723
+[120]-[2026-10-04 18:32:10]-[logInfo]-epoch[8]-step[800] loss: 0.1105, l1: 0.1105
+[121]-[2026-10-04 18:32:36]-[logInfo]-epoch[8]-step[1000] loss: 0.0680, l1: 0.0680
+[122]-[2026-10-04 18:33:03]-[logInfo]-epoch[8]-step[1200] loss: 0.0774, l1: 0.0774
+[123]-[2026-10-04 18:33:31]-[logInfo]-epoch[8]-step[1400] loss: 0.1128, l1: 0.1128
+[124]-[2026-10-04 18:34:00]-[logInfo]-epoch[8]-step[1600] loss: 0.0850, l1: 0.0850
+[125]-[2026-10-04 18:35:13]-[logInfo]-epoch[8]-step[0] Dataset: Set14, PSNR: 24.1001, SSIM: 0.6222
+[126]-[2026-10-04 18:35:14]-[logInfo]-epoch[8]-step[0] Dataset: Set5, PSNR: 26.0987, SSIM: 0.7424
+[127]-[2026-10-04 18:35:40]-[logInfo]-epoch[9]-step[200] loss: 0.0718, l1: 0.0718
+[128]-[2026-10-04 18:36:07]-[logInfo]-epoch[9]-step[400] loss: 0.0303, l1: 0.0303
+[129]-[2026-10-04 18:36:34]-[logInfo]-epoch[9]-step[600] loss: 0.0948, l1: 0.0948
+[130]-[2026-10-04 18:37:02]-[logInfo]-epoch[9]-step[800] loss: 0.0971, l1: 0.0971
+[131]-[2026-10-04 18:37:29]-[logInfo]-epoch[9]-step[1000] loss: 0.0655, l1: 0.0655
+[132]-[2026-10-04 18:37:57]-[logInfo]-epoch[9]-step[1200] loss: 0.0638, l1: 0.0638
+[133]-[2026-10-04 18:38:25]-[logInfo]-epoch[9]-step[1400] loss: 0.1053, l1: 0.1053
+[134]-[2026-10-04 18:38:53]-[logInfo]-epoch[9]-step[1600] loss: 0.1000, l1: 0.1000
+[135]-[2026-10-04 18:39:47]-[logInfo]-epoch[9]-step[0] Dataset: Set14, PSNR: 24.1166, SSIM: 0.6211
+[136]-[2026-10-04 18:40:10]-[logInfo]-epoch[9]-step[0] Dataset: Set5, PSNR: 26.0729, SSIM: 0.7394
+[137]-[2026-10-04 18:40:37]-[logInfo]-epoch[10]-step[200] loss: 0.0432, l1: 0.0432
+[138]-[2026-10-04 18:41:02]-[logInfo]-epoch[10]-step[400] loss: 0.0924, l1: 0.0924
+[139]-[2026-10-04 18:41:27]-[logInfo]-epoch[10]-step[600] loss: 0.0675, l1: 0.0675
+[140]-[2026-10-04 18:41:52]-[logInfo]-epoch[10]-step[800] loss: 0.0437, l1: 0.0437
+[141]-[2026-10-04 18:42:20]-[logInfo]-epoch[10]-step[1000] loss: 0.0812, l1: 0.0812
+[142]-[2026-10-04 18:42:45]-[logInfo]-epoch[10]-step[1200] loss: 0.0588, l1: 0.0588
+[143]-[2026-10-04 18:43:09]-[logInfo]-epoch[10]-step[1400] loss: 0.0672, l1: 0.0672
+[144]-[2026-10-04 18:43:35]-[logInfo]-epoch[10]-step[1600] loss: 0.1015, l1: 0.1015
+[145]-[2026-10-04 18:44:24]-[logInfo]-epoch[10]-step[0] Dataset: Set14, PSNR: 24.1142, SSIM: 0.6221
+[146]-[2026-10-04 18:44:24]-[logInfo]-epoch[10]-step[0] Dataset: Set5, PSNR: 26.1508, SSIM: 0.7447
+[147]-[2026-10-04 18:44:53]-[logInfo]-epoch[11]-step[200] loss: 0.0736, l1: 0.0736
+[148]-[2026-10-04 18:45:19]-[logInfo]-epoch[11]-step[400] loss: 0.0591, l1: 0.0591
+[149]-[2026-10-04 18:45:46]-[logInfo]-epoch[11]-step[600] loss: 0.1011, l1: 0.1011
+[150]-[2026-10-04 18:46:14]-[logInfo]-epoch[11]-step[800] loss: 0.0821, l1: 0.0821
+[151]-[2026-10-04 18:46:40]-[logInfo]-epoch[11]-step[1000] loss: 0.0711, l1: 0.0711
+[152]-[2026-10-04 18:47:08]-[logInfo]-epoch[11]-step[1200] loss: 0.0799, l1: 0.0799
+[153]-[2026-10-04 18:47:36]-[logInfo]-epoch[11]-step[1400] loss: 0.0662, l1: 0.0662
+[154]-[2026-10-04 18:48:07]-[logInfo]-epoch[11]-step[1600] loss: 0.0374, l1: 0.0374
+[155]-[2026-10-04 18:49:09]-[logInfo]-epoch[11]-step[0] Dataset: Set14, PSNR: 24.1636, SSIM: 0.6227
+[156]-[2026-10-04 18:49:09]-[logInfo]-epoch[11]-step[0] Dataset: Set5, PSNR: 26.2020, SSIM: 0.7467
+[157]-[2026-10-04 18:49:38]-[logInfo]-epoch[12]-step[200] loss: 0.0681, l1: 0.0681
+[158]-[2026-10-04 18:50:07]-[logInfo]-epoch[12]-step[400] loss: 0.0670, l1: 0.0670
+[159]-[2026-10-04 18:50:34]-[logInfo]-epoch[12]-step[600] loss: 0.0710, l1: 0.0710
+[160]-[2026-10-04 18:51:03]-[logInfo]-epoch[12]-step[800] loss: 0.1120, l1: 0.1120
+[161]-[2026-10-04 18:51:32]-[logInfo]-epoch[12]-step[1000] loss: 0.0678, l1: 0.0678
+[162]-[2026-10-04 18:52:01]-[logInfo]-epoch[12]-step[1200] loss: 0.0573, l1: 0.0573
+[163]-[2026-10-04 18:52:30]-[logInfo]-epoch[12]-step[1400] loss: 0.0904, l1: 0.0904
+[164]-[2026-10-04 18:53:00]-[logInfo]-epoch[12]-step[1600] loss: 0.0549, l1: 0.0549
+[165]-[2026-10-04 18:54:00]-[logInfo]-epoch[12]-step[0] Dataset: Set14, PSNR: 24.1784, SSIM: 0.6247
+[166]-[2026-10-04 18:54:01]-[logInfo]-epoch[12]-step[0] Dataset: Set5, PSNR: 26.2054, SSIM: 0.7476
+[167]-[2026-10-04 18:54:29]-[logInfo]-epoch[13]-step[200] loss: 0.0924, l1: 0.0924
+[168]-[2026-10-04 18:54:58]-[logInfo]-epoch[13]-step[400] loss: 0.0557, l1: 0.0557
+[169]-[2026-10-04 18:55:23]-[logInfo]-epoch[13]-step[600] loss: 0.0743, l1: 0.0743
+[170]-[2026-10-04 18:55:42]-[logInfo]-epoch[13]-step[800] loss: 0.0620, l1: 0.0620
+[171]-[2026-10-04 18:56:07]-[logInfo]-epoch[13]-step[1000] loss: 0.0749, l1: 0.0749
+[172]-[2026-10-04 18:56:34]-[logInfo]-epoch[13]-step[1200] loss: 0.0586, l1: 0.0586
+[173]-[2026-10-04 18:57:02]-[logInfo]-epoch[13]-step[1400] loss: 0.0717, l1: 0.0717
+[174]-[2026-10-04 18:57:30]-[logInfo]-epoch[13]-step[1600] loss: 0.0612, l1: 0.0612
+[175]-[2026-10-04 18:59:02]-[logInfo]-epoch[13]-step[0] Dataset: Set14, PSNR: 24.1684, SSIM: 0.6247
+[176]-[2026-10-04 18:59:02]-[logInfo]-epoch[13]-step[0] Dataset: Set5, PSNR: 26.2177, SSIM: 0.7480
+[177]-[2026-10-04 18:59:29]-[logInfo]-epoch[14]-step[200] loss: 0.0729, l1: 0.0729
+[178]-[2026-10-04 18:59:57]-[logInfo]-epoch[14]-step[400] loss: 0.0619, l1: 0.0619
+[179]-[2026-10-04 19:00:22]-[logInfo]-epoch[14]-step[600] loss: 0.0843, l1: 0.0843
+[180]-[2026-10-04 19:00:49]-[logInfo]-epoch[14]-step[800] loss: 0.1143, l1: 0.1143
+[181]-[2026-10-04 19:01:16]-[logInfo]-epoch[14]-step[1000] loss: 0.0603, l1: 0.0603
+[182]-[2026-10-04 19:01:45]-[logInfo]-epoch[14]-step[1200] loss: 0.1167, l1: 0.1167
+[183]-[2026-10-04 19:02:12]-[logInfo]-epoch[14]-step[1400] loss: 0.0894, l1: 0.0894
+[184]-[2026-10-04 19:02:41]-[logInfo]-epoch[14]-step[1600] loss: 0.0628, l1: 0.0628
+[185]-[2026-10-04 19:03:36]-[logInfo]-epoch[14]-step[0] Dataset: Set14, PSNR: 24.1546, SSIM: 0.6229
+[186]-[2026-10-04 19:03:42]-[logInfo]-epoch[14]-step[0] Dataset: Set5, PSNR: 26.1821, SSIM: 0.7437
+[187]-[2026-10-04 19:04:10]-[logInfo]-epoch[15]-step[200] loss: 0.0482, l1: 0.0482
+[188]-[2026-10-04 19:04:36]-[logInfo]-epoch[15]-step[400] loss: 0.0377, l1: 0.0377
+[189]-[2026-10-04 19:05:04]-[logInfo]-epoch[15]-step[600] loss: 0.0801, l1: 0.0801
+[190]-[2026-10-04 19:05:31]-[logInfo]-epoch[15]-step[800] loss: 0.0656, l1: 0.0656
+[191]-[2026-10-04 19:05:58]-[logInfo]-epoch[15]-step[1000] loss: 0.0735, l1: 0.0735
+[192]-[2026-10-04 19:06:23]-[logInfo]-epoch[15]-step[1200] loss: 0.0713, l1: 0.0713
+[193]-[2026-10-04 19:06:51]-[logInfo]-epoch[15]-step[1400] loss: 0.0528, l1: 0.0528
+[194]-[2026-10-04 19:07:22]-[logInfo]-epoch[15]-step[1600] loss: 0.0850, l1: 0.0850
+[195]-[2026-10-04 19:08:29]-[logInfo]-epoch[15]-step[0] Dataset: Set14, PSNR: 24.1835, SSIM: 0.6258
+[196]-[2026-10-04 19:08:30]-[logInfo]-epoch[15]-step[0] Dataset: Set5, PSNR: 26.2308, SSIM: 0.7492
+[197]-[2026-10-04 19:08:57]-[logInfo]-epoch[16]-step[200] loss: 0.0780, l1: 0.0780
+[198]-[2026-10-04 19:09:25]-[logInfo]-epoch[16]-step[400] loss: 0.0663, l1: 0.0663
+[199]-[2026-10-04 19:09:50]-[logInfo]-epoch[16]-step[600] loss: 0.1095, l1: 0.1095
+[200]-[2026-10-04 19:10:15]-[logInfo]-epoch[16]-step[800] loss: 0.0750, l1: 0.0750
+[201]-[2026-10-04 19:10:43]-[logInfo]-epoch[16]-step[1000] loss: 0.0336, l1: 0.0336
+[202]-[2026-10-04 19:11:12]-[logInfo]-epoch[16]-step[1200] loss: 0.0737, l1: 0.0737
+[203]-[2026-10-04 19:11:41]-[logInfo]-epoch[16]-step[1400] loss: 0.0802, l1: 0.0802
+[204]-[2026-10-04 19:12:11]-[logInfo]-epoch[16]-step[1600] loss: 0.1172, l1: 0.1172
+[205]-[2026-10-04 19:13:52]-[logInfo]-epoch[16]-step[0] Dataset: Set14, PSNR: 24.2442, SSIM: 0.6274
+[206]-[2026-10-04 19:13:53]-[logInfo]-epoch[16]-step[0] Dataset: Set5, PSNR: 26.3037, SSIM: 0.7523
+[207]-[2026-10-04 19:14:19]-[logInfo]-epoch[17]-step[200] loss: 0.0510, l1: 0.0510
+[208]-[2026-10-04 19:14:47]-[logInfo]-epoch[17]-step[400] loss: 0.0829, l1: 0.0829
+[209]-[2026-10-04 19:15:16]-[logInfo]-epoch[17]-step[600] loss: 0.0726, l1: 0.0726
+[210]-[2026-10-04 19:15:45]-[logInfo]-epoch[17]-step[800] loss: 0.0780, l1: 0.0780
+[211]-[2026-10-04 19:16:14]-[logInfo]-epoch[17]-step[1000] loss: 0.0684, l1: 0.0684
+[212]-[2026-10-04 19:16:42]-[logInfo]-epoch[17]-step[1200] loss: 0.0774, l1: 0.0774
+[213]-[2026-10-04 19:17:10]-[logInfo]-epoch[17]-step[1400] loss: 0.0561, l1: 0.0561
+[214]-[2026-10-04 19:17:39]-[logInfo]-epoch[17]-step[1600] loss: 0.0618, l1: 0.0618
+[215]-[2026-10-04 19:19:03]-[logInfo]-epoch[17]-step[0] Dataset: Set14, PSNR: 24.2563, SSIM: 0.6283
+[216]-[2026-10-04 19:19:03]-[logInfo]-epoch[17]-step[0] Dataset: Set5, PSNR: 26.2713, SSIM: 0.7508
+[217]-[2026-10-04 19:19:31]-[logInfo]-epoch[18]-step[200] loss: 0.1248, l1: 0.1248
+[218]-[2026-10-04 19:20:00]-[logInfo]-epoch[18]-step[400] loss: 0.0777, l1: 0.0777
+[219]-[2026-10-04 19:20:27]-[logInfo]-epoch[18]-step[600] loss: 0.0776, l1: 0.0776
+[220]-[2026-10-04 19:20:53]-[logInfo]-epoch[18]-step[800] loss: 0.0596, l1: 0.0596
+[221]-[2026-10-04 19:21:18]-[logInfo]-epoch[18]-step[1000] loss: 0.0486, l1: 0.0486
+[222]-[2026-10-04 19:21:45]-[logInfo]-epoch[18]-step[1200] loss: 0.0817, l1: 0.0817
+[223]-[2026-10-04 19:22:14]-[logInfo]-epoch[18]-step[1400] loss: 0.1313, l1: 0.1313
+[224]-[2026-10-04 19:22:43]-[logInfo]-epoch[18]-step[1600] loss: 0.0731, l1: 0.0731
+[225]-[2026-10-04 19:23:42]-[logInfo]-epoch[18]-step[0] Dataset: Set14, PSNR: 24.2355, SSIM: 0.6271
+[226]-[2026-10-04 19:23:42]-[logInfo]-epoch[18]-step[0] Dataset: Set5, PSNR: 26.2807, SSIM: 0.7517
+[227]-[2026-10-04 19:24:10]-[logInfo]-epoch[19]-step[200] loss: 0.0564, l1: 0.0564
+[228]-[2026-10-04 19:24:38]-[logInfo]-epoch[19]-step[400] loss: 0.0809, l1: 0.0809
+[229]-[2026-10-04 19:25:06]-[logInfo]-epoch[19]-step[600] loss: 0.1017, l1: 0.1017
+[230]-[2026-10-04 19:25:35]-[logInfo]-epoch[19]-step[800] loss: 0.0614, l1: 0.0614
+[231]-[2026-10-04 19:26:02]-[logInfo]-epoch[19]-step[1000] loss: 0.0367, l1: 0.0367
+[232]-[2026-10-04 19:26:28]-[logInfo]-epoch[19]-step[1200] loss: 0.1077, l1: 0.1077
+[233]-[2026-10-04 19:26:50]-[logInfo]-epoch[19]-step[1400] loss: 0.0517, l1: 0.0517
+[234]-[2026-10-04 19:27:07]-[logInfo]-epoch[19]-step[1600] loss: 0.0707, l1: 0.0707
+[235]-[2026-10-04 19:28:19]-[logInfo]-epoch[19]-step[0] Dataset: Set14, PSNR: 24.2514, SSIM: 0.6266
+[236]-[2026-10-04 19:28:25]-[logInfo]-epoch[19]-step[0] Dataset: Set5, PSNR: 26.2854, SSIM: 0.7508
+[237]-[2026-10-04 19:28:52]-[logInfo]-epoch[20]-step[200] loss: 0.0933, l1: 0.0933
+[238]-[2026-10-04 19:29:16]-[logInfo]-epoch[20]-step[400] loss: 0.0934, l1: 0.0934
+[239]-[2026-10-04 19:29:41]-[logInfo]-epoch[20]-step[600] loss: 0.0178, l1: 0.0178
+[240]-[2026-10-04 19:30:06]-[logInfo]-epoch[20]-step[800] loss: 0.0874, l1: 0.0874
+[241]-[2026-10-04 19:30:31]-[logInfo]-epoch[20]-step[1000] loss: 0.0603, l1: 0.0603
+[242]-[2026-10-04 19:30:57]-[logInfo]-epoch[20]-step[1200] loss: 0.1125, l1: 0.1125
+[243]-[2026-10-04 19:31:24]-[logInfo]-epoch[20]-step[1400] loss: 0.0982, l1: 0.0982
+[244]-[2026-10-04 19:31:52]-[logInfo]-epoch[20]-step[1600] loss: 0.0763, l1: 0.0763
+[245]-[2026-10-04 19:32:56]-[logInfo]-epoch[20]-step[0] Dataset: Set14, PSNR: 24.2372, SSIM: 0.6268
+[246]-[2026-10-04 19:32:56]-[logInfo]-epoch[20]-step[0] Dataset: Set5, PSNR: 26.2895, SSIM: 0.7513
